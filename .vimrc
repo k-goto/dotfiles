@@ -161,6 +161,10 @@ let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
 " vim-ref
 let g:ref_phpmanual_path = "/home/keita/.vim/bundle/vim-ref/manual/php-chunked-xhtml/"
 
+" vimshell
+let g:vimproc_dll_path = "/home/keita/dotvims/bundle/vimproc/autoload/proc.so"
+nnoremap <silent> ,is :VimShell<CR>
+
 " タグリストの設定あれこれ
 " とりあえず Tlist 打ちましょう
 command -nargs=0 Form :tabedit %<Form.pm
