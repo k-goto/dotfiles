@@ -4,7 +4,7 @@ call pathogen#runtime_append_all_bundles()
 
 " 文字コード自動判別
 set encoding=utf-8
-set fileencodings=ucs-bom,iso-2022-jp-3,iso-2022-jp,eucjp-ms,euc-jisx0213,euc-jp,sjis,cp932,utf-8
+set fileencodings=utf-8,ucs-bom,iso-2022-jp-3,iso-2022-jp,eucjp-ms,euc-jisx0213,euc-jp,sjis,cp932
 
 " オートインデント
 set ai
@@ -12,7 +12,7 @@ set ai
 set is
 
 " タブ文字無効
-set expandtab
+"set expandtab
 
 " タブ文字表示
 "set list
@@ -122,6 +122,10 @@ inoremap <expr><C-h> neocomplcache#smart_close_popup() . "\<C-h>"
 inoremap <expr><BS> neocomplcache#smart_close_popup() . "\<BS>"
 " タブにて次の候補へ
 inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+" C-nでneocomplcache補完
+inoremap <expr><C-n>  pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
+" 補完候補の共通部分までを補完する
+inoremap <expr><C-l> neocomplcache#complete_common_string()
 " 日本語をキャッシュしない
 if !exists('g:neocomplcache_keyword_patterns')
   let g:neocomplcache_keyword_patterns = {}
@@ -129,6 +133,21 @@ endif
 let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
 " Eclipseのようなキャメルの大文字のみによる補完(Java書くわけじゃないし重いし)
 let g:neocomplcache_enable_camel_case_completion = 0
+let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+function InsertTabWrapper()
+    if pumvisible()
+        return "\<c-n>"
+    endif
+    let col = col('.') - 1
+    if !col || getline('.')[col - 1] !~ '\k\|<\|/'
+        return "\<tab>"
+    elseif exists('&omnifunc') && &omnifunc == ''
+        return "\<c-n>"
+    else
+        return "\<c-x>\<c-o>"
+    endif
+endfunction
+inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 
 " Enable onmi completion
 autocmd FileType * let g:acp_completeOption = '.,w,b,u,t,i'
@@ -164,6 +183,18 @@ let g:ref_phpmanual_path = "/home/keita/.vim/bundle/vim-ref/manual/php-chunked-x
 " vimshell
 let g:vimproc_dll_path = "/home/keita/dotvims/bundle/vimproc/autoload/proc.so"
 nnoremap <silent> ,is :VimShell<CR>
+
+" unite
+" バッファ一覧
+nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
+" ファイル一覧
+nnoremap <silent> ,uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+" レジスタ一覧
+nnoremap <silent> ,ur :<C-u>Unite -buffer-name=register register<CR>
+" 最近使用したファイル一覧
+nnoremap <silent> ,um :<C-u>Unite file_mru<CR>
+" 常用セット
+nnoremap <silent> ,uu :<C-u>Unite buffer file_mru file<CR>
 
 " タグリストの設定あれこれ
 " とりあえず Tlist 打ちましょう
