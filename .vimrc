@@ -1,6 +1,24 @@
-source /etc/vimrc
-" pathogen
-call pathogen#runtime_append_all_bundles()
+"source /etc/vimrc
+
+set nocompatible
+filetype off
+
+set rtp+=~/dotvims/vundle/
+call vundle#rc()
+
+" let Vundle manage Vundle
+" required! 
+Bundle 'gmarik/vundle'
+
+" vundleによるプラグイン管理
+Bundle 'Shougo/neocomplcache'
+Bundle 'Shougo/unite.vim'
+Bundle 'Shougo/vimproc'
+Bundle 'Shougo/vimshell'
+Bundle 'thinca/vim-quickrun'
+Bundle 'thinca/vim-ref'
+Bundle 'tpope/vim-surround'
+Bundle 'tpope/vim-rails'
 
 " 文字コード自動判別
 set encoding=utf-8
