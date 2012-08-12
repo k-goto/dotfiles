@@ -44,7 +44,10 @@ set shiftwidth=4
 " キーボードで入力したTABが変換される空白文字数
 " 0はイコールtabstop
 set softtabstop=0
-colorscheme evening
+colorscheme desert
+
+" シンタックスハイライト
+syntax on
 
 " 折り返し（無効に）
 set nowrap
