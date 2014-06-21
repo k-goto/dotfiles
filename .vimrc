@@ -3,22 +3,35 @@
 set nocompatible
 filetype off
 
-set rtp+=~/dotvims/vundle/
-call vundle#rc()
+" neobundle
+if has('vim_starting')
+  set runtimepath+=~/dotvims/vundle/neobundle.vim/
+endif
 
-" let Vundle manage Vundle
-" required! 
-Bundle 'gmarik/vundle'
+call neobundle#rc(expand('~/.vim/bundle/'))
+NeoBundleFetch 'Shougo/neobundle.vim'
 
-" vundleによるプラグイン管理
-Bundle 'Shougo/neocomplcache'
-Bundle 'Shougo/unite.vim'
-Bundle 'Shougo/vimproc'
-Bundle 'Shougo/vimshell'
-Bundle 'thinca/vim-quickrun'
-Bundle 'thinca/vim-ref'
-Bundle 'tpope/vim-surround'
-Bundle 'tpope/vim-rails'
+" neobundleによるプラグイン管理
+NeoBundle 'Shougo/neocomplcache'
+NeoBundle 'Shougo/neomru.vim'
+NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/vimproc', {
+  \ 'build': {
+  \   'windows' : 'make -f make_mingw32.mak',
+  \   'cygwin'  : 'make -f make_cygwin.mak',
+  \   'mac'     : 'make -f make_mac.mak',
+  \   'unix'    : 'make -f make_unix.mak',
+  \ },
+  \ }
+NeoBundle 'Shougo/vimshell'
+NeoBundle 'thinca/vim-quickrun'
+NeoBundle 'thinca/vim-ref'
+NeoBundle 'tpope/vim-surround'
+NeoBundle 'tpope/vim-rails'
+NeoBundle 'kchmck/vim-coffee-script'
+NeoBundleLazy 'jelera/vim-javascript-syntax', {'autoload':{'filetypes':['javascript']}}
+NeoBundle 'digitaltoad/vim-jade'
+NeoBundleCheck
 
 " 文字コード自動判別
 set encoding=utf-8
@@ -30,16 +43,16 @@ set ai
 set is
 
 " タブ文字無効
-"set expandtab
+set expandtab
 
 " タブ文字表示
-"set list
+set list
 
 " 開いたファイルタブの描画する空白の数
-set tabstop=4
+set tabstop=2
 
 " オートインデントなどが挿入する文字幅
-set shiftwidth=4
+set shiftwidth=2
 
 " キーボードで入力したTABが変換される空白文字数
 " 0はイコールtabstop
