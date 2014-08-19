@@ -6,6 +6,7 @@ filetype off
 " neobundle
 if has('vim_starting')
   set runtimepath+=~/dotvims/vundle/neobundle.vim/
+  set runtimepath+=~/.vim/bundle/
 endif
 
 call neobundle#rc(expand('~/.vim/bundle/'))
@@ -31,6 +32,10 @@ NeoBundle 'tpope/vim-rails'
 NeoBundle 'kchmck/vim-coffee-script'
 NeoBundleLazy 'jelera/vim-javascript-syntax', {'autoload':{'filetypes':['javascript']}}
 NeoBundle 'digitaltoad/vim-jade'
+NeoBundle 'scrooloose/nerdtree'
+NeoBundle 'Townk/vim-autoclose'
+NeoBundle 'tomtom/tcomment_vim'
+NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundleCheck
 
 " 文字コード自動判別
@@ -199,7 +204,6 @@ let g:rubycomplete_rails = 1
 let g:rails_level = 4
 " other
 autocmd FileType python set omnifunc=pythoncomplete#Complete
-autocmd filetype javascript set omnifunc=javascriptcomplete#completejs
 autocmd filetype html set omnifunc=htmlcomplete#completetags
 autocmd filetype css set omnifunc=csscomplete#completecss
 autocmd filetype xml set omnifunc=xmlcomplete#completetags
@@ -212,10 +216,10 @@ let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
 let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
 
 " vim-ref
-let g:ref_phpmanual_path = "/home/keita/.vim/bundle/vim-ref/manual/php-chunked-xhtml/"
+" let g:ref_phpmanual_path = "/home/keita/.vim/bundle/vim-ref/manual/php-chunked-xhtml/"
 
 " vimshell
-let g:vimproc_dll_path = "/home/keita/dotvims/bundle/vimproc/autoload/proc.so"
+let g:vimproc_dll_path = "//Users/keita/.vim/bundle/vimproc/autoload/vimproc_mac.so"
 nnoremap <silent> ,is :VimShell<CR>
 
 " unite
@@ -241,3 +245,8 @@ let Tlist_Exit_OnlyWindow = 1             "taglistのウィンドーが最後の
 let Tlist_Use_Right_Window = 1            "右側でtaglistのウィンドーを表示
 let Tlist_Use_SingleClick = 1            "シングルクリックでジャンプ
 
+" NERDTree
+" 隠しファイルをデフォルトで表示させる
+let NERDTreeShowHidden = 1
+
+nnoremap <silent> <S-n> :<C-u>NERDTree<CR>
