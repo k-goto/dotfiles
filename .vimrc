@@ -33,9 +33,11 @@ NeoBundle 'kchmck/vim-coffee-script'
 NeoBundleLazy 'jelera/vim-javascript-syntax', {'autoload':{'filetypes':['javascript']}}
 NeoBundle 'digitaltoad/vim-jade'
 NeoBundle 'scrooloose/nerdtree'
-NeoBundle 'Townk/vim-autoclose'
-NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'nathanaelkane/vim-indent-guides'
+NeoBundle 'mattn/webapi-vim'
+NeoBundle 'tyru/open-browser.vim'
+NeoBundle 'superbrothers/vim-quickrun-markdown-gfm'
+NeoBundle 'tpope/vim-endwise'
 NeoBundleCheck
 
 " 文字コード自動判別
@@ -49,6 +51,8 @@ set is
 
 " タブ文字無効
 set expandtab
+" ただしPHPはタブ文字を入れる
+" autocmd FileType php set noexpandtab
 
 " タブ文字表示
 set list
@@ -70,9 +74,15 @@ syntax on
 " 折り返し（無効に）
 set nowrap
 
+" 保存時に行末スペースを取り除く
+"autocmd BufWritePre * :%s/\s\+$//ge
+
 " マウス
 "set mouse=a
 "set ttymouse=xterm2
+
+" 大文字小文字を区別しないで検索する
+set ignorecase
 
 " 検索語を強調表示（<C-L>を押すと現在の強調表示を解除する）
 set hlsearch
@@ -204,8 +214,6 @@ let g:rubycomplete_rails = 1
 let g:rails_level = 4
 " other
 autocmd FileType python set omnifunc=pythoncomplete#Complete
-autocmd filetype html set omnifunc=htmlcomplete#completetags
-autocmd filetype css set omnifunc=csscomplete#completecss
 autocmd filetype xml set omnifunc=xmlcomplete#completetags
 autocmd filetype c set omnifunc=ccomplete#complete
 " Enable heavy omni completion.
@@ -249,4 +257,24 @@ let Tlist_Use_SingleClick = 1            "シングルクリックでジャン�
 " 隠しファイルをデフォルトで表示させる
 let NERDTreeShowHidden = 1
 
-nnoremap <silent> <S-n> :<C-u>NERDTree<CR>
+nnoremap <silent> <S-t> :<C-u>NERDTree<CR>
+
+" quickrun_config
+let g:quickrun_config = {
+\   'markdown': {
+\     'type': 'markdown/gfm',
+\     'outputter': 'browser'
+\   }
+\ }
+
+set foldenable
+set foldmethod=syntax
+
+autocmd InsertEnter * if !exists('w:last_fdm')
+            \| let w:last_fdm=&foldmethod
+            \| setlocal foldmethod=manual
+            \| endif
+autocmd InsertLeave,WinLeave * if exists('w:last_fdm')
+            \| let &l:foldmethod=w:last_fdm
+            \| unlet w:last_fdm
+            \| endif
