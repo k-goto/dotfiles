@@ -5,11 +5,10 @@ filetype off
 
 " neobundle
 if has('vim_starting')
-  set runtimepath+=~/dotvims/vundle/neobundle.vim/
-  set runtimepath+=~/.vim/bundle/
+  set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
 
-call neobundle#rc(expand('~/.vim/bundle/'))
+call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundleFetch 'Shougo/neobundle.vim'
 
 " neobundleによるプラグイン管理
@@ -28,7 +27,7 @@ NeoBundle 'Shougo/vimshell'
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'thinca/vim-ref'
 NeoBundle 'tpope/vim-surround'
-NeoBundle 'tpope/vim-rails'
+" NeoBundle 'tpope/vim-rails'
 NeoBundle 'kchmck/vim-coffee-script'
 NeoBundleLazy 'jelera/vim-javascript-syntax', {'autoload':{'filetypes':['javascript']}}
 NeoBundle 'digitaltoad/vim-jade'
@@ -38,7 +37,10 @@ NeoBundle 'mattn/webapi-vim'
 NeoBundle 'tyru/open-browser.vim'
 NeoBundle 'superbrothers/vim-quickrun-markdown-gfm'
 NeoBundle 'tpope/vim-endwise'
+NeoBundle 'vim-scripts/SQLUtilities'
 NeoBundleCheck
+
+call neobundle#end()
 
 " 文字コード自動判別
 set encoding=utf-8
@@ -208,10 +210,10 @@ autocmd FileType php :set makeprg=php\ -l\ %
 " ruby
 autocmd FileType ruby set omnifunc=rubycomplete#Complete
 autocmd FileType ruby :set makeprg=ruby\ -c\ %
-let g:rubycomplete_buffer_loading = 1
-let g:rubycomplete_classes_in_global = 1
-let g:rubycomplete_rails = 1
-let g:rails_level = 4
+"let g:rubycomplete_buffer_loading = 1
+"let g:rubycomplete_classes_in_global = 1
+" let g:rubycomplete_rails = 1
+" let g:rails_level = 4
 " other
 autocmd FileType python set omnifunc=pythoncomplete#Complete
 autocmd filetype xml set omnifunc=xmlcomplete#completetags
@@ -227,7 +229,7 @@ let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
 " let g:ref_phpmanual_path = "/home/keita/.vim/bundle/vim-ref/manual/php-chunked-xhtml/"
 
 " vimshell
-let g:vimproc_dll_path = "//Users/keita/.vim/bundle/vimproc/autoload/vimproc_mac.so"
+let g:vimproc_dll_path = "//Users/keita/.vim/bundle/vimproc/lib/vimproc_mac.so"
 nnoremap <silent> ,is :VimShell<CR>
 
 " unite
@@ -267,14 +269,14 @@ let g:quickrun_config = {
 \   }
 \ }
 
-set foldenable
-set foldmethod=syntax
-
-autocmd InsertEnter * if !exists('w:last_fdm')
-            \| let w:last_fdm=&foldmethod
-            \| setlocal foldmethod=manual
-            \| endif
-autocmd InsertLeave,WinLeave * if exists('w:last_fdm')
-            \| let &l:foldmethod=w:last_fdm
-            \| unlet w:last_fdm
-            \| endif
+" set foldenable
+" set foldmethod=syntax
+" 
+" autocmd InsertEnter * if !exists('w:last_fdm')
+"             \| let w:last_fdm=&foldmethod
+"             \| setlocal foldmethod=manual
+"             \| endif
+" autocmd InsertLeave,WinLeave * if exists('w:last_fdm')
+"             \| let &l:foldmethod=w:last_fdm
+"             \| unlet w:last_fdm
+"             \| endif
