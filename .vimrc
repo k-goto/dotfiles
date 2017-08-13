@@ -82,6 +82,7 @@ set nowrap
 " マウス
 "set mouse=a
 "set ttymouse=xterm2
+set mouse=c
 
 " 大文字小文字を区別しないで検索する
 set ignorecase
@@ -114,6 +115,9 @@ if winwidth(0) >= 120
 else
   set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']'}%y\ %f%=[%{GetB()}]\ %l,%c%V%8P
 endif
+
+" ◯などの文字が上手くカーソル移動できない問題への対応
+set ambiwidth=double
 
 function! GetB()
   let c = matchstr(getline('.'), '.', col('.') - 1)
