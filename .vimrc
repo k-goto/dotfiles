@@ -1,286 +1,530 @@
-"source /etc/vimrc
+" vim-bootstrap 5268b45
 
-set nocompatible
-filetype off
-
-" neobundle
+"*****************************************************************************
+"" Vim-PLug core
+"*****************************************************************************
 if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
+  " おまじない
+  set nocompatible               " Be iMproved
 endif
 
-call neobundle#begin(expand('~/.vim/bundle/'))
-NeoBundleFetch 'Shougo/neobundle.vim'
+" plug.vimの存在確認
+let vimplug_exists=expand('~/.vim/autoload/plug.vim')
 
-" neobundleによるプラグイン管理
-NeoBundle 'Shougo/neocomplcache'
-NeoBundle 'Shougo/neomru.vim'
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'Shougo/vimproc', {
-  \ 'build': {
-  \   'windows' : 'make -f make_mingw32.mak',
-  \   'cygwin'  : 'make -f make_cygwin.mak',
-  \   'mac'     : 'make -f make_mac.mak',
-  \   'unix'    : 'make -f make_unix.mak',
-  \ },
-  \ }
-NeoBundle 'Shougo/vimshell'
-NeoBundle 'thinca/vim-quickrun'
-NeoBundle 'thinca/vim-ref'
-NeoBundle 'tpope/vim-surround'
-" NeoBundle 'tpope/vim-rails'
-NeoBundle 'kchmck/vim-coffee-script'
-NeoBundleLazy 'jelera/vim-javascript-syntax', {'autoload':{'filetypes':['javascript']}}
-NeoBundle 'digitaltoad/vim-jade'
-NeoBundle 'scrooloose/nerdtree'
-NeoBundle 'nathanaelkane/vim-indent-guides'
-NeoBundle 'mattn/webapi-vim'
-NeoBundle 'tyru/open-browser.vim'
-NeoBundle 'superbrothers/vim-quickrun-markdown-gfm'
-NeoBundle 'tpope/vim-endwise'
-NeoBundle 'vim-scripts/SQLUtilities'
-NeoBundleCheck
+let g:vim_bootstrap_langs = "ruby"
+let g:vim_bootstrap_editor = "vim"				" nvim or vim
 
-call neobundle#end()
+" plug.vimがなければインストール
+if !filereadable(vimplug_exists)
+  if !executable("curl")
+    echoerr "You have to install curl or first install vim-plug yourself!"
+    execute "q!"
+  endif
+  echo "Installing Vim-Plug..."
+  echo ""
+  silent !\curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  let g:not_finish_vimplug = "yes"
 
-" 文字コード自動判別
+  autocmd VimEnter * PlugInstall
+endif
+
+" Required:
+call plug#begin(expand('~/.vim/plugged'))
+
+"*****************************************************************************
+"" Plug install packages
+"*****************************************************************************
+Plug 'tpope/vim-commentary' "gccでコメント入れてくれるコ
+Plug 'tpope/vim-fugitive' "gitラッパープラグイン
+Plug 'vim-airline/vim-airline' "ステータスバーをカスタマイズするプラグイン
+Plug 'vim-airline/vim-airline-themes'
+Plug 'airblade/vim-gitgutter' "差分を表示するプラグイン
+Plug 'vim-scripts/grep.vim' "vim上でgrep :Grep
+Plug 'vim-scripts/CSApprox' "Gvimでのみ利用可能なcolorschemeをterminal Vimで動作させる
+Plug 'bronson/vim-trailing-whitespace' "文末の空白を赤くハイライトしてくれる
+Plug 'Raimondi/delimitMate' "括弧を自動で閉じてくれるプラグイン。いつも今ひとつ使いこなせない
+Plug 'majutsushi/tagbar' "ctagsをin-memoryでやってくれる :TagbarToggle
+Plug 'scrooloose/syntastic' "シンタックスチェックプラグイン
+Plug 'avelino/vim-bootstrap-updater'
+Plug 'sheerun/vim-polyglot' "各言語用プラグイン(ruby.vimなど)を適切に適応してくれるプラグイン
+if isdirectory('/usr/local/opt/fzf')
+  Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
+else
+  Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+  Plug 'junegunn/fzf.vim'
+endif
+let g:make = 'gmake'
+if exists('make')
+        let g:make = 'make'
+endif
+Plug 'Shougo/vimproc.vim', {'do': g:make}
+
+"" Vim-Session
+" 開いているファイルを保存しておいて、次回起動時に自動で開く機能を提供
+Plug 'xolox/vim-misc'
+Plug 'xolox/vim-session'
+
+if v:version >= 703
+  Plug 'Shougo/vimshell.vim'
+endif
+
+if v:version >= 704
+  "" Snippets
+  Plug 'SirVer/ultisnips'
+endif
+
+Plug 'honza/vim-snippets'
+
+"" Color
+Plug 'tomasr/molokai'
+
+"*****************************************************************************
+"" Custom bundles
+"*****************************************************************************
+
+" ruby
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-rake'
+Plug 'tpope/vim-projectionist'
+Plug 'thoughtbot/vim-rspec'
+Plug 'ecomba/vim-ruby-refactoring'
+
+
+"*****************************************************************************
+"*****************************************************************************
+
+"" Include user's extra bundle
+if filereadable(expand("~/.vimrc.local.bundles"))
+  source ~/.vimrc.local.bundles
+endif
+
+call plug#end()
+
+" Required:
+filetype plugin indent on
+
+
+"*****************************************************************************
+"" Basic Setup
+"*****************************************************************************"
+"" Encoding
 set encoding=utf-8
-set fileencodings=utf-8,ucs-bom,iso-2022-jp-3,iso-2022-jp,eucjp-ms,euc-jisx0213,euc-jp,sjis,cp932
+set fileencoding=utf-8
+set fileencodings=utf-8
+set bomb
+set binary
+set ttyfast
 
-" オートインデント
-set ai
-" インクリメンタルサーチ
-set is
+"" Fix backspace indent
+set backspace=indent,eol,start
 
-" タブ文字無効
-set expandtab
-" ただしPHPはタブ文字を入れる
-" autocmd FileType php set noexpandtab
-
-" タブ文字表示
-set list
-
-" 開いたファイルタブの描画する空白の数
-set tabstop=2
-
-" オートインデントなどが挿入する文字幅
-set shiftwidth=2
-
-" キーボードで入力したTABが変換される空白文字数
-" 0はイコールtabstop
+"" Tabs. May be overridden by autocmd rules
+set tabstop=4
 set softtabstop=0
-colorscheme desert
+set shiftwidth=4
+set expandtab
 
-" シンタックスハイライト
-syntax on
+"" Map leader to ,
+let mapleader=','
 
-" 折り返し（無効に）
-set nowrap
+"" Enable hidden buffers
+set hidden
 
-" 保存時に行末スペースを取り除く
-"autocmd BufWritePre * :%s/\s\+$//ge
-
-" マウス
-"set mouse=a
-"set ttymouse=xterm2
-set mouse=c
-
-" 大文字小文字を区別しないで検索する
-set ignorecase
-
-" 検索語を強調表示（<C-L>を押すと現在の強調表示を解除する）
+"" Searching
 set hlsearch
+set incsearch
+set ignorecase
+set smartcase
 
-" カーソル行をハイライト
-set cursorline
-" カレントウィンドウにのみは線を引く
-augroup cch
-    autocmd! cch
-    autocmd WinLeave * set nocursorline
-    autocmd WinEnter,BufRead * set cursorline
-augroup end
-highlight CursorLine ctermbg=black guibg=black
-" 全角スペースの表示
-highlight ZenkakuSpace cterm=reverse ctermfg=darkgray guibg=darkgray
-match ZenkakuSpace /　/
+"" Directories for swp files
+set nobackup
+set noswapfile
 
-" ステータス行を表示
+set fileformats=unix,dos,mac
+
+if exists('$SHELL')
+    set shell=$SHELL
+else
+    set shell=/bin/sh
+endif
+
+" session management
+let g:session_directory = "~/.vim/session"
+let g:session_autoload = "no"
+let g:session_autosave = "no"
+let g:session_command_aliases = 1
+
+"*****************************************************************************
+"" Visual Settings
+"*****************************************************************************
+syntax on
+set ruler
+set number
+
+let no_buffers_menu=1
+if !exists('g:not_finish_vimplug')
+  colorscheme molokai
+endif
+
+set mousemodel=popup
+set t_Co=256
+set guioptions=egmrti
+set gfn=Monospace\ 10
+
+if has("gui_running")
+  if has("gui_mac") || has("gui_macvim")
+    set guifont=Menlo:h12
+    set transparency=7
+  endif
+else
+  let g:CSApprox_loaded = 1
+
+  if $COLORTERM == 'gnome-terminal'
+    set term=gnome-256color
+  else
+    if $TERM == 'xterm'
+      set term=xterm-256color
+    endif
+  endif
+endif
+
+
+if &term =~ '256color'
+  set t_ut=
+endif
+
+
+"" Disable the blinking cursor.
+set gcr=a:blinkon0
+set scrolloff=3
+
+"" Status bar
 set laststatus=2
 
-" コマンドライン補完表示
-set wildmenu
+"" Use modeline overrides
+set modeline
+set modelines=10
 
-" ステータスラインに文字コードと改行文字を表示する
-if winwidth(0) >= 120
-  set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']'}%y\ %F%=[%{GetB()}]\ %l,%c%V%8P
+set title
+set titleold="Terminal"
+set titlestring=%F
+
+set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\
+
+" Search mappings: These will make it so that going to the next one in a
+" search will center on the line it's found in.
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+if exists("*fugitive#statusline")
+  set statusline+=%{fugitive#statusline()}
+endif
+
+" vim-airline
+let g:airline_theme = 'powerlineish'
+let g:airline#extensions#syntastic#enabled = 1
+let g:airline#extensions#branch#enabled = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tagbar#enabled = 1
+let g:airline_skip_empty_sections = 1
+
+"*****************************************************************************
+"" Abbreviations
+"*****************************************************************************
+"" no one is really happy until you have this shortcuts
+cnoreabbrev W! w!
+cnoreabbrev Q! q!
+cnoreabbrev Qall! qall!
+cnoreabbrev Wq wq
+cnoreabbrev Wa wa
+cnoreabbrev wQ wq
+cnoreabbrev WQ wq
+cnoreabbrev W w
+cnoreabbrev Q q
+cnoreabbrev Qall qall
+
+" grep.vim
+nnoremap <silent> <leader>f :Rgrep<CR>
+let Grep_Default_Options = '-IR'
+let Grep_Skip_Files = '*.log *.db'
+let Grep_Skip_Dirs = '.git node_modules'
+
+" vimshell.vim
+let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
+let g:vimshell_prompt =  '$ '
+
+" terminal emulation
+if g:vim_bootstrap_editor == 'nvim'
+  nnoremap <silent> <leader>sh :terminal<CR>
 else
-  set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']'}%y\ %f%=[%{GetB()}]\ %l,%c%V%8P
+  nnoremap <silent> <leader>sh :VimShellCreate<CR>
 endif
 
-" ◯などの文字が上手くカーソル移動できない問題への対応
-set ambiwidth=double
-
-function! GetB()
-  let c = matchstr(getline('.'), '.', col('.') - 1)
-  let c = iconv(c, &enc, &fenc)
-  return String2Hex(c)
-endfunction
-" help eval-examples
-" The function Nr2Hex() returns the Hex string of a number.
-func! Nr2Hex(nr)
-  let n = a:nr
-  let r = ""
-  while n
-    let r = '0123456789ABCDEF'[n % 16] . r
-    let n = n / 16
-  endwhile
-  return r
-endfunc
-" The function String2Hex() converts each character in a string to a two
-" character Hex string.
-func! String2Hex(str)
-  let out = ''
-  let ix = 0
-  while ix < strlen(a:str)
-    let out = out . Nr2Hex(char2nr(a:str[ix]))
-    let ix = ix + 1
-  endwhile
-  return out
-endfunc
-
-" insert mode での移動
-imap  <C-e> <END>
-imap  <C-a> <HOME>
-
-" 辞書
-imap <C-J> <C-X><C-K>
-
-" ファイルタイプによるインデント制御の有効化
-filetype on
-filetype indent on
-filetype plugin on
-
-" 自動補完
-setlocal omnifunc=syntaxcomplete#Complete
-
-hi Pmenu ctermbg=lightgray
-hi PmenuSel ctermbg=cyan
-hi PmenuSbar ctermbg=blue
-
-" neocomplcache
-" 起動時に有効にする
-let g:neocomplcache_enable_at_startup = 1
-" 1番目の候補を自動選択
-let g:neocomplcache_enable_auto_select = 1
-" key-mappings for neocomplcache
-" 補完ポップアップを閉じる
-inoremap <expr><C-h> neocomplcache#smart_close_popup() . "\<C-h>"
-inoremap <expr><BS> neocomplcache#smart_close_popup() . "\<BS>"
-" タブにて次の候補へ
-inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-" C-nでneocomplcache補完
-inoremap <expr><C-n>  pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
-" 補完候補の共通部分までを補完する
-inoremap <expr><C-l> neocomplcache#complete_common_string()
-" 日本語をキャッシュしない
-if !exists('g:neocomplcache_keyword_patterns')
-  let g:neocomplcache_keyword_patterns = {}
+"*****************************************************************************
+"" Functions
+"*****************************************************************************
+if !exists('*s:setupWrapping')
+  function s:setupWrapping()
+    set wrap
+    set wm=2
+    set textwidth=79
+  endfunction
 endif
-let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
-" Eclipseのようなキャメルの大文字のみによる補完(Java書くわけじゃないし重いし)
-let g:neocomplcache_enable_camel_case_completion = 0
-let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-function InsertTabWrapper()
-    if pumvisible()
-        return "\<c-n>"
-    endif
-    let col = col('.') - 1
-    if !col || getline('.')[col - 1] !~ '\k\|<\|/'
-        return "\<tab>"
-    elseif exists('&omnifunc') && &omnifunc == ''
-        return "\<c-n>"
-    else
-        return "\<c-x>\<c-o>"
-    endif
-endfunction
-inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 
-" Enable onmi completion
-autocmd FileType * let g:acp_completeOption = '.,w,b,u,t,i'
-" perl
-autocmd FileType perl let g:acp_completeOption = '.,w,b,u,t,'
-" php
-autocmd FileType php set omnifunc=phpcomplete#CompletePHP
-autocmd FileType php :set makeprg=php\ -l\ %
+"*****************************************************************************
+"" Autocmd Rules
+"*****************************************************************************
+"" The PC is fast enough, do syntax highlight syncing from start unless 200 lines
+augroup vimrc-sync-fromstart
+  autocmd!
+  autocmd BufEnter * :syntax sync maxlines=200
+augroup END
+
+"" Remember cursor position
+augroup vimrc-remember-cursor-position
+  autocmd!
+  autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+augroup END
+
+"" txt
+augroup vimrc-wrapping
+  autocmd!
+  autocmd BufRead,BufNewFile *.txt call s:setupWrapping()
+augroup END
+
+"" make/cmake
+augroup vimrc-make-cmake
+  autocmd!
+  autocmd FileType make setlocal noexpandtab
+  autocmd BufNewFile,BufRead CMakeLists.txt setlocal filetype=cmake
+augroup END
+
+set autoread
+
+"*****************************************************************************
+"" Mappings
+"*****************************************************************************
+
+"" Split
+noremap <Leader>h :<C-u>split<CR>
+noremap <Leader>v :<C-u>vsplit<CR>
+
+"" Git
+noremap <Leader>ga :Gwrite<CR>
+noremap <Leader>gc :Gcommit<CR>
+noremap <Leader>gsh :Gpush<CR>
+noremap <Leader>gll :Gpull<CR>
+noremap <Leader>gs :Gstatus<CR>
+noremap <Leader>gb :Gblame<CR>
+noremap <Leader>gd :Gvdiff<CR>
+noremap <Leader>gr :Gremove<CR>
+
+" session management
+nnoremap <leader>so :OpenSession<Space>
+nnoremap <leader>ss :SaveSession<Space>
+nnoremap <leader>sd :DeleteSession<CR>
+nnoremap <leader>sc :CloseSession<CR>
+
+"" Tabs
+nnoremap <Tab> gt
+nnoremap <S-Tab> gT
+nnoremap <silent> <S-t> :tabnew<CR>
+
+"" Set working directory
+nnoremap <leader>. :lcd %:p:h<CR>
+
+"" Opens an edit command with the path of the currently edited file filled in
+noremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
+
+"" Opens a tab edit command with the path of the currently edited file filled
+noremap <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
+
+"" fzf.vim
+set wildmode=list:longest,list:full
+set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__
+let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
+
+" The Silver Searcher
+if executable('ag')
+  let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -g ""'
+  set grepprg=ag\ --nogroup\ --nocolor
+endif
+
+" ripgrep
+if executable('rg')
+  let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow --glob "!.git/*"'
+  set grepprg=rg\ --vimgrep
+  command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
+endif
+
+cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
+nnoremap <silent> <leader>b :Buffers<CR>
+nnoremap <silent> <leader>e :FZF -m<CR>
+
+" snippets
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<c-b>"
+let g:UltiSnipsEditSplit="vertical"
+
+" syntastic
+let g:syntastic_always_populate_loc_list=1
+let g:syntastic_error_symbol='✗'
+let g:syntastic_warning_symbol='⚠'
+let g:syntastic_style_error_symbol = '✗'
+let g:syntastic_style_warning_symbol = '⚠'
+let g:syntastic_auto_loc_list=1
+let g:syntastic_aggregate_errors = 1
+
+" Tagbar
+nmap <silent> <F4> :TagbarToggle<CR>
+let g:tagbar_autofocus = 1
+
+" Disable visualbell
+set noerrorbells visualbell t_vb=
+if has('autocmd')
+  autocmd GUIEnter * set visualbell t_vb=
+endif
+
+"" Copy/Paste/Cut
+if has('unnamedplus')
+  set clipboard=unnamed,unnamedplus
+endif
+
+noremap YY "+y<CR>
+noremap <leader>p "+gP<CR>
+noremap XX "+x<CR>
+
+if has('macunix')
+  " pbcopy for OSX copy/paste
+  vmap <C-x> :!pbcopy<CR>
+  vmap <C-c> :w !pbcopy<CR><CR>
+endif
+
+"" Buffer nav
+noremap <leader>z :bp<CR>
+noremap <leader>q :bp<CR>
+noremap <leader>x :bn<CR>
+noremap <leader>w :bn<CR>
+
+"" Close buffer
+noremap <leader>c :bd<CR>
+
+"" Clean search (highlight)
+nnoremap <silent> <leader><space> :noh<cr>
+
+"" Switching windows
+noremap <C-j> <C-w>j
+noremap <C-k> <C-w>k
+noremap <C-l> <C-w>l
+noremap <C-h> <C-w>h
+
+"" Vmap for maintain Visual Mode after shifting > and <
+vmap < <gv
+vmap > >gv
+
+"" Move visual block
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+"" Open current line on GitHub
+nnoremap <Leader>o :.Gbrowse<CR>
+
+"*****************************************************************************
+"" Custom configs
+"*****************************************************************************
+
 " ruby
-autocmd FileType ruby set omnifunc=rubycomplete#Complete
-autocmd FileType ruby :set makeprg=ruby\ -c\ %
-"let g:rubycomplete_buffer_loading = 1
-"let g:rubycomplete_classes_in_global = 1
-" let g:rubycomplete_rails = 1
-" let g:rails_level = 4
-" other
-autocmd FileType python set omnifunc=pythoncomplete#Complete
-autocmd filetype xml set omnifunc=xmlcomplete#completetags
-autocmd filetype c set omnifunc=ccomplete#complete
-" Enable heavy omni completion.
-if !exists('g:neocomplcache_omni_patterns')
-  let g:neocomplcache_omni_patterns = {}
-endif
-let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
-let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+let g:rubycomplete_buffer_loading = 1
+let g:rubycomplete_classes_in_global = 1
+let g:rubycomplete_rails = 1
 
-" vim-ref
-" let g:ref_phpmanual_path = "/home/keita/.vim/bundle/vim-ref/manual/php-chunked-xhtml/"
+augroup vimrc-ruby
+  autocmd!
+  autocmd BufNewFile,BufRead *.rb,*.rbw,*.gemspec setlocal filetype=ruby
+  autocmd FileType ruby set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
+augroup END
 
-" vimshell
-let g:vimproc_dll_path = "//Users/keita/.vim/bundle/vimproc/lib/vimproc_mac.so"
-nnoremap <silent> ,is :VimShell<CR>
-
-" unite
-" バッファ一覧
-nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
-" ファイル一覧
-nnoremap <silent> ,uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-" レジスタ一覧
-nnoremap <silent> ,ur :<C-u>Unite -buffer-name=register register<CR>
-" 最近使用したファイル一覧
-nnoremap <silent> ,um :<C-u>Unite file_mru<CR>
-" 常用セット
-nnoremap <silent> ,uu :<C-u>Unite buffer file_mru file<CR>
-
-" タグリストの設定あれこれ
-" とりあえず Tlist 打ちましょう
-command -nargs=0 Form :tabedit %<Form.pm
-command -nargs=0 Tag :set tags=tags
-" taglist
-let Tlist_Ctags_Cmd = "/usr/bin/ctags"    "ctagsのパス
-let Tlist_Show_One_File = 1               "現在編集中のソースのタグしか表示しない
-let Tlist_Exit_OnlyWindow = 1             "taglistのウィンドーが最後のウィンドーならばVimを閉じる
-let Tlist_Use_Right_Window = 1            "右側でtaglistのウィンドーを表示
-let Tlist_Use_SingleClick = 1            "シングルクリックでジャンプ
-
-" NERDTree
-" 隠しファイルをデフォルトで表示させる
-let NERDTreeShowHidden = 1
-
-nnoremap <silent> <S-t> :<C-u>NERDTree<CR>
-
-" quickrun_config
-let g:quickrun_config = {
-\   'markdown': {
-\     'type': 'markdown/gfm',
-\     'outputter': 'browser'
-\   }
+let g:tagbar_type_ruby = {
+    \ 'kinds' : [
+        \ 'm:modules',
+        \ 'c:classes',
+        \ 'd:describes',
+        \ 'C:contexts',
+        \ 'f:methods',
+        \ 'F:singleton methods'
+    \ ]
 \ }
 
-" set foldenable
-" set foldmethod=syntax
-" 
-" autocmd InsertEnter * if !exists('w:last_fdm')
-"             \| let w:last_fdm=&foldmethod
-"             \| setlocal foldmethod=manual
-"             \| endif
-" autocmd InsertLeave,WinLeave * if exists('w:last_fdm')
-"             \| let &l:foldmethod=w:last_fdm
-"             \| unlet w:last_fdm
-"             \| endif
+" RSpec.vim mappings
+map <Leader>t :call RunCurrentSpecFile()<CR>
+map <Leader>s :call RunNearestSpec()<CR>
+map <Leader>l :call RunLastSpec()<CR>
+map <Leader>a :call RunAllSpecs()<CR>
+
+" For ruby refactory
+if has('nvim')
+  runtime! macros/matchit.vim
+else
+  packadd! matchit
+endif
+
+" Ruby refactory
+nnoremap <leader>rap  :RAddParameter<cr>
+nnoremap <leader>rcpc :RConvertPostConditional<cr>
+nnoremap <leader>rel  :RExtractLet<cr>
+vnoremap <leader>rec  :RExtractConstant<cr>
+vnoremap <leader>relv :RExtractLocalVariable<cr>
+nnoremap <leader>rit  :RInlineTemp<cr>
+vnoremap <leader>rrlv :RRenameLocalVariable<cr>
+vnoremap <leader>rriv :RRenameInstanceVariable<cr>
+vnoremap <leader>rem  :RExtractMethod<cr>
+
+
+"*****************************************************************************
+"*****************************************************************************
+
+"" Include user's local vim config
+if filereadable(expand("~/.vimrc.local"))
+  source ~/.vimrc.local
+endif
+
+"*****************************************************************************
+"" Convenience variables
+"*****************************************************************************
+
+" vim-airline
+if !exists('g:airline_symbols')
+  let g:airline_symbols = {}
+endif
+
+if !exists('g:airline_powerline_fonts')
+  let g:airline#extensions#tabline#left_sep = ' '
+  let g:airline#extensions#tabline#left_alt_sep = '|'
+  let g:airline_left_sep          = '▶'
+  let g:airline_left_alt_sep      = '»'
+  let g:airline_right_sep         = '◀'
+  let g:airline_right_alt_sep     = '«'
+  let g:airline#extensions#branch#prefix     = '⤴' "➔, ➥, ⎇
+  let g:airline#extensions#readonly#symbol   = '⊘'
+  let g:airline#extensions#linecolumn#prefix = '¶'
+  let g:airline#extensions#paste#symbol      = 'ρ'
+  let g:airline_symbols.linenr    = '␊'
+  let g:airline_symbols.branch    = '⎇'
+  let g:airline_symbols.paste     = 'ρ'
+  let g:airline_symbols.paste     = 'Þ'
+  let g:airline_symbols.paste     = '∥'
+  let g:airline_symbols.whitespace = 'Ξ'
+else
+  let g:airline#extensions#tabline#left_sep = ''
+  let g:airline#extensions#tabline#left_alt_sep = ''
+
+  " powerline symbols
+  let g:airline_left_sep = ''
+  let g:airline_left_alt_sep = ''
+  let g:airline_right_sep = ''
+  let g:airline_right_alt_sep = ''
+  let g:airline_symbols.branch = ''
+  let g:airline_symbols.readonly = ''
+  let g:airline_symbols.linenr = ''
+endif
