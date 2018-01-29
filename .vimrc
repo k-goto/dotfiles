@@ -44,9 +44,10 @@ Plug 'vim-scripts/CSApprox' "Gvimでのみ利用可能なcolorschemeをterminal 
 Plug 'bronson/vim-trailing-whitespace' "文末の空白を赤くハイライトしてくれる
 Plug 'Raimondi/delimitMate' "括弧を自動で閉じてくれるプラグイン。いつも今ひとつ使いこなせない
 Plug 'majutsushi/tagbar' "ctagsをin-memoryでやってくれる :TagbarToggle
-Plug 'scrooloose/syntastic' "シンタックスチェックプラグイン
+"Plug 'scrooloose/syntastic' "シンタックスチェックプラグイン
 Plug 'avelino/vim-bootstrap-updater'
 Plug 'sheerun/vim-polyglot' "各言語用プラグイン(ruby.vimなど)を適切に適応してくれるプラグイン
+Plug 'thinca/vim-quickrun'
 if isdirectory('/usr/local/opt/fzf')
   Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
 else
@@ -117,6 +118,7 @@ set ttyfast
 
 "" Fix backspace indent
 set backspace=indent,eol,start
+set nowrap
 
 "" Tabs. May be overridden by autocmd rules
 set tabstop=4
@@ -339,6 +341,9 @@ noremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 "" Opens a tab edit command with the path of the currently edited file filled
 noremap <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
 
+"" QuickRun
+noremap \r :QuickRun<CR>
+
 "" fzf.vim
 set wildmode=list:longest,list:full
 set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__
@@ -368,13 +373,13 @@ let g:UltiSnipsJumpBackwardTrigger="<c-b>"
 let g:UltiSnipsEditSplit="vertical"
 
 " syntastic
-let g:syntastic_always_populate_loc_list=1
-let g:syntastic_error_symbol='✗'
-let g:syntastic_warning_symbol='⚠'
-let g:syntastic_style_error_symbol = '✗'
-let g:syntastic_style_warning_symbol = '⚠'
-let g:syntastic_auto_loc_list=1
-let g:syntastic_aggregate_errors = 1
+" let g:syntastic_always_populate_loc_list=1
+" let g:syntastic_error_symbol='✗'
+" let g:syntastic_warning_symbol='⚠'
+" let g:syntastic_style_error_symbol = '✗'
+" let g:syntastic_style_warning_symbol = '⚠'
+" let g:syntastic_auto_loc_list=1
+" let g:syntastic_aggregate_errors = 1
 
 " Tagbar
 nmap <silent> <F4> :TagbarToggle<CR>
@@ -443,6 +448,7 @@ augroup vimrc-ruby
   autocmd!
   autocmd BufNewFile,BufRead *.rb,*.rbw,*.gemspec setlocal filetype=ruby
   autocmd FileType ruby set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
+  autocmd FileType scss set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
 augroup END
 
 let g:tagbar_type_ruby = {
