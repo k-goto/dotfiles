@@ -449,6 +449,7 @@ augroup vimrc-ruby
   autocmd BufNewFile,BufRead *.rb,*.rbw,*.gemspec setlocal filetype=ruby
   autocmd FileType ruby set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
   autocmd FileType scss set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
+  autocmd FileType coffee set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
 augroup END
 
 let g:tagbar_type_ruby = {
