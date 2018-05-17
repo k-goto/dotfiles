@@ -48,6 +48,8 @@ Plug 'majutsushi/tagbar' "ctagsをin-memoryでやってくれる :TagbarToggle
 Plug 'avelino/vim-bootstrap-updater'
 Plug 'sheerun/vim-polyglot' "各言語用プラグイン(ruby.vimなど)を適切に適応してくれるプラグイン
 Plug 'thinca/vim-quickrun'
+Plug 'plasticboy/vim-markdown'
+Plug 'kannokanno/previm'
 if isdirectory('/usr/local/opt/fzf')
   Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
 else
@@ -121,9 +123,9 @@ set backspace=indent,eol,start
 set nowrap
 
 "" Tabs. May be overridden by autocmd rules
-set tabstop=4
+set tabstop=2
 set softtabstop=0
-set shiftwidth=4
+set shiftwidth=2
 set expandtab
 
 "" Map leader to ,
@@ -535,3 +537,9 @@ else
   let g:airline_symbols.readonly = ''
   let g:airline_symbols.linenr = ''
 endif
+
+let g:previm_open_cmd = 'open -a Google\ Chrome'
+augroup PrevimSettings
+    autocmd!
+    autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+augroup END
